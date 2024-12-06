@@ -2,13 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import HomeIcon from "../../assets/icons/home.svg";
 import Notification from "../../assets/icons/notification.svg";
-import Avatar from "../../assets/images/avatars/avatar_1.png";
 import Logo from "../../assets/images/logo.svg";
 import { useAuth } from "../../hooks/useAuth";
+import { useProfile } from "../../hooks/useProfile";
 import Logout from "../auth/Logout";
 
 const Header = () => {
   const { Auth } = useAuth();
+  const { state } = useProfile();
+
+  const user = state?.user ?? Auth?.user;
 
   return (
     <>
@@ -35,16 +38,16 @@ const Header = () => {
             {/* logout page ... */}
             <Logout />
 
-            <button className="flex-center !ml-8 gap-3">
+            <Link to={"/me"}>
               <span className="text-lg font-medium lg:text-xl">
-                {Auth?.user?.firstName}
+                {state?.user?.firstName} {state?.user?.lastName}
               </span>
               <img
                 className="max-h-[32px] max-w-[32px] lg:max-h-[44px] lg:max-w-[44px]"
-                src={Avatar}
-                alt=""
+                src={`${import.meta.env.VITE_SERVER_BASE_URL}/${user.avatar}`}
+                alt="avatar"
               />
-            </button>
+            </Link>
           </div>
           {/* <!-- nav links ends --> */}
         </div>
