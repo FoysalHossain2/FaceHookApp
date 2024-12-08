@@ -36,7 +36,7 @@ const RegistrationForm = () => {
   return (
     <>
       <form
-        class="border-b border-[#3F3F3F] pb-10 lg:pb-[30px]"
+        className="border-b border-[#3F3F3F] pb-10 lg:pb-[30px]"
         onSubmit={handleSubmit(submitForm)}
       >
         <Field label="FirstName" error={errors.firstName}>

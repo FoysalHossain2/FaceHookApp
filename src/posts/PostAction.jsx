@@ -1,14 +1,28 @@
 import React, { useState } from "react";
+import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import CommentIcon from "../assets/icons/comment.svg";
-import LikeIcon from "../assets/icons/like.svg";
 import ShareIcon from "../assets/icons/share.svg";
+import { useAuth } from "../hooks/useAuth";
 import useAxios from "../hooks/useAxios";
 
-const PostAction = ({ postId, commentCount }) => {
-  const [Liked, setLiked] = useState(false);
+const PostAction = ({ post, commentCount }) => {
+  const { auth } = useAuth();
+  const [Liked, setLiked] = useState(post?.likes?.includes(auth?.user?.id));
   const { api } = useAxios();
 
-  const HandleLike = () => {};
+  const HandleLike = async () => {
+    try {
+      const response = await api.patch(
+        `${import.meta.env.VITE_SERVER_BASE_URL}/posts/${post.id}/like`
+      );
+      if (response.status === 200) {
+        setLiked(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setLiked(false);
+    }
+  };
 
   return (
     <>
@@ -19,8 +33,12 @@ const PostAction = ({ postId, commentCount }) => {
           onClick={HandleLike}
           className="flex-center gap-2 text-xs font-bold text-[#B8BBBF] hover:text-white lg:text-sm"
         >
-          <img src={LikeIcon} alt="Like" />
-          <span>Like</span>
+          {Liked ? (
+            <AiFillLike className="text-[25px]" />
+          ) : (
+            <AiOutlineLike className="text-[25px]" />
+          )}
+          {!Liked && <span>Like</span>}
         </button>
 
         {/* <!-- Comment Button --> */}

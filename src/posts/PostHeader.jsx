@@ -1,19 +1,50 @@
 import React, { useState } from "react";
+import { actions } from "../actions";
+import api from "../api";
 import ThreeDotsIcon from "../assets/icons/3dots.svg";
 import EditIcon from "../assets/icons/edit.svg";
 import {
   default as DeleteIcon,
   default as TimeIcon,
 } from "../assets/icons/time.svg";
+import { useAuth } from "../hooks/useAuth";
 import { useAvatar } from "../hooks/useAvatar";
+import { usePost } from "../hooks/usePost";
 import { getDateDifferenceFromNow } from "../utils";
 
 const PostHeader = ({ post }) => {
   const [ShowActin, setShowActin] = useState(false);
   const { avatarURL } = useAvatar(post);
+  const { Auth } = useAuth();
+  const { dispatch } = usePost;
+
+  const isMe = post?.author?.id === Auth?.user?.id;
 
   const toggleAction = () => {
     setShowActin(!ShowActin);
+  };
+
+  const HandleDeletePost = async () => {
+    dispatch({ type: actions.post.DATA_FETCHING });
+
+    try {
+      const response = await api.delete(
+        `${import.meta.env.VITE_SERVER_BASE_URL}/posts/${post.id}`
+      );
+
+      if (response.status === 200) {
+        dispatch({
+          type: actions.post.POST_DELETED,
+          data: post.id,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({
+        type: actions.post.DATA_FETCH_ERROR,
+        error: response.error,
+      });
+    }
   };
 
   return (
@@ -40,9 +71,11 @@ const PostHeader = ({ post }) => {
           {/* <!-- author info ends --> */}
 
           <div className="relative">
-            <button onClick={toggleAction}>
-              <img src={ThreeDotsIcon} alt="3dots of Action" />
-            </button>
+            {isMe && (
+              <button onClick={toggleAction}>
+                <img src={ThreeDotsIcon} alt="3dots of Action" />
+              </button>
+            )}
 
             {ShowActin && (
               <div className="action-modal-container ">
@@ -50,7 +83,10 @@ const PostHeader = ({ post }) => {
                   <img src={EditIcon} alt="Edit" />
                   Edit
                 </button>
-                <button className="action-menu-item hover:text-red-500">
+                <button
+                  onClick={HandleDeletePost}
+                  className="action-menu-item hover:text-red-500"
+                >
                   <img src={DeleteIcon} alt="Delete" />
                   Delete
                 </button>
