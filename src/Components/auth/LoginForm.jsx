@@ -23,8 +23,10 @@ const LoginForm = () => {
         formData
       );
 
-      if (response.status === 200) {
         const { token, user } = response.data;
+
+        console.log(response.data);
+
         if (token) {
           const authToken = token.token;
           const refreshToken = token.refreshToken;
@@ -33,7 +35,7 @@ const LoginForm = () => {
           setAuth({ user, authToken, refreshToken });
           navigate("/");
         }
-      }
+        
     } catch (error) {
       setError("root.random", {
         type: "random",
